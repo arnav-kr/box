@@ -1,0 +1,23 @@
+{
+  "name": "box",
+  "version": "1.0.0",
+  "description": "The Box",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node --env-file=.env index.js"
+  },
+  "repository": "https://github.com/arnav-kr/box",
+  "author": "arnav-kr (https://github.com/arnav-kr)",
+  "license": "AGPL-3.0",
+  "private": false,
+  "dependencies": {
+    "@supabase/supabase-js": "^2.48.1",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "knex": "^3.1.0",
+    "pg": "^8.13.3",
+    "valibot": "^1.0.0-rc.1"
+  }
+}
