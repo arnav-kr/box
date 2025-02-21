@@ -64,7 +64,7 @@ app.get("/boxes", (req, res) => {
     res.status(200).json(r.map(b => {
       delete b.solution;
       b.boxUrl = `/box/${b.id}`;
-      b.solveUrl = `/box/${b.id}/solve
+      b.solveUrl = `/box/${b.id}/solve`;
       return b;
     }));
   }).catch(err => {
