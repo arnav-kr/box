@@ -60,7 +60,7 @@ app.get("/boxes", (req, res) => {
   if (limit > 50) limit = 50;
   const offset = (page - 1) * limit;
 
-  boxes.select("id, name, content, difficulty, tags").limit(limit).offset(offset).then(r => {
+  boxes.select("*").limit(limit).offset(offset).then(r => {
     res.status(200).json(r.map(b => {
       delete b.solution;
       return b;
