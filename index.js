@@ -63,6 +63,8 @@ app.get("/boxes", (req, res) => {
   boxes.select("*").limit(limit).offset(offset).then(r => {
     res.status(200).json(r.map(b => {
       delete b.solution;
+      b.boxUrl = `/box/${b.id}`;
+      b.solveUrl = `/box/${b.id}/solve
       return b;
     }));
   }).catch(err => {
@@ -126,6 +128,8 @@ app.get("/box/:id", (req, res) => {
     }
     const box = r[0];
     delete box.solution;
+    box.boxUrl = `/box/${id}`;
+    box.solveUrl = `/box/${id}/solve`;
     res.status(200).json(box);
   }).catch(err => {
     console.error(err);
