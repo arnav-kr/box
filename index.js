@@ -42,7 +42,7 @@ POST /box/:id/solve - solve a box by id
     }
 
 Quick Tips: 
-    Use ggl.link/jsonformatter to easy work with JSON data in Browser
+    Use ggl.link/jsonformatter to easily work with JSON data in Browser
     Use curl or other tools to interact with the API from terminal
 
 Author: github.com/arnav-kr
