@@ -3,8 +3,9 @@ import cors from "cors";
 import { safeParse } from 'valibot';
 import { limiter, corsOptions, PORT } from "./lib/config.js";
 import { BoxCreateSchema, SolveBoxSchema } from "./lib/schema.js";
-import { boxes } from "./lib/supabase.js";
+import DB from "./lib/supabase.js";
 import { hashSolution, validateSolution } from "./lib/hash.js";
+import { validateId } from "./lib/util.js";
 
 const app = express();
 
@@ -60,7 +61,7 @@ app.get("/boxes", (req, res) => {
   if (limit > 50) limit = 50;
   const offset = (page - 1) * limit;
 
-  boxes.select("*").limit(limit).offset(offset).then(r => {
+  DB('boxes').withSchema('private').select("*").limit(limit).offset(offset).then(r => {
     res.status(200).json(r.map(b => {
       delete b.solution;
       b.boxUrl = `/box/${b.id}`;
@@ -87,7 +88,7 @@ app.post("/create", (req, res) => {
   }
   const data = result.output;
   data.solution = hashSolution(data.solution);
-  boxes.insert(data, "id").then(r => {
+  DB('boxes').withSchema('private').insert(data, "id").then(r => {
     const id = r[0].id;
     res.status(200).json({
       success: true,
@@ -119,7 +120,13 @@ app.get("/box/:id", (req, res) => {
       message: "Box ID is required as /box/:id"
     });
   }
-  boxes.select("*").where("id", id).then(r => {
+  if (!validateId(id)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid Box ID"
+    });
+  }
+  DB('boxes').withSchema('private').select("*").where("id", parseInt(id)).then(r => {
     if (r.length === 0) {
       return res.status(404).json({
         success: false,
@@ -148,6 +155,12 @@ app.post("/box/:id/solve", (req, res) => {
       message: "Box ID is required as /box/:id/solve"
     });
   }
+  if (!validateId(id)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid Box ID"
+    });
+  }
 
   const result = safeParse(SolveBoxSchema, req.body);
   if (!result.success) {
@@ -159,7 +172,7 @@ app.post("/box/:id/solve", (req, res) => {
   }
   const solution = result.output.solution;
 
-  boxes.select("solution").where("id", id).then(r => {
+  DB('boxes').withSchema('private').select("solution").where("id", parseInt(id)).then(r => {
     if (r.length === 0) {
       return res.status(404).json({
         success: false,
