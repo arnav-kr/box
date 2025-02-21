@@ -1,10 +1,10 @@
 import express from "express";
 import cors from "cors";
 import { safeParse } from 'valibot';
-import { limiter, corsOptions, csp, PORT } from "./lib/config.js";
+import { limiter, corsOptions, PORT } from "./lib/config.js";
 import { BoxCreateSchema, SolveBoxSchema } from "./lib/schema.js";
 import { boxes } from "./lib/supabase.js";
-import { hashSolution } from "./lib/hash.js";
+import { hashSolution, validateSolution } from "./lib/hash.js";
 
 const app = express();
 
@@ -95,6 +95,12 @@ app.post("/create", (req, res) => {
       solveUrl: `/box/${id}/solve`,
     });
   }).catch(err => {
+    if (err.code === "23505") {
+      return res.status(400).json({
+        success: false,
+        message: "Box with same name already exists"
+      });
+    }
     console.error(err);
     res.status(500).json({
       success: false,
@@ -148,7 +154,6 @@ app.post("/box/:id/solve", (req, res) => {
     });
   }
   const solution = result.output.solution;
-  const hashedSolution = hashSolution(solution);
 
   boxes.select("solution").where("id", id).then(r => {
     if (r.length === 0) {
@@ -157,7 +162,7 @@ app.post("/box/:id/solve", (req, res) => {
         message: "Box not found"
       });
     }
-    if (r[0].solution !== hashedSolution) {
+    if (!validateSolution(solution, r[0].solution)) {
       return res.status(400).json({
         success: false,
         message: "Invalid solution"
