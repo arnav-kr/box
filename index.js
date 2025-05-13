@@ -3,7 +3,7 @@ import cors from "cors";
 import { safeParse } from 'valibot';
 import { limiter, corsOptions, PORT } from "./lib/config.js";
 import { BoxCreateSchema, SolveBoxSchema } from "./lib/schema.js";
-import DB from "./lib/supabase.js";
+import DB from "./lib/database.js";
 import { hashSolution, validateSolution } from "./lib/hash.js";
 import { validateId } from "./lib/util.js";
 
