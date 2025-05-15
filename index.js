@@ -61,7 +61,7 @@ app.get("/boxes", (req, res) => {
   if (limit > 50) limit = 50;
   const offset = (page - 1) * limit;
 
-  DB('boxes').withSchema('private').select("*").limit(limit).offset(offset).then(r => {
+  DB('boxes').select("*").limit(limit).offset(offset).then(r => {
     res.status(200).json(r.map(b => {
       delete b.solution;
       b.boxUrl = `/box/${b.id}`;
@@ -88,7 +88,7 @@ app.post("/create", (req, res) => {
   }
   const data = result.output;
   data.solution = hashSolution(data.solution);
-  DB('boxes').withSchema('private').insert(data, "id").then(r => {
+  DB('boxes').insert(data, "id").then(r => {
     const id = r[0].id;
     res.status(200).json({
       success: true,
@@ -126,7 +126,7 @@ app.get("/box/:id", (req, res) => {
       message: "Invalid Box ID"
     });
   }
-  DB('boxes').withSchema('private').select("*").where("id", parseInt(id)).then(r => {
+  DB('boxes').select("*").where("id", parseInt(id)).then(r => {
     if (r.length === 0) {
       return res.status(404).json({
         success: false,
@@ -172,7 +172,7 @@ app.post("/box/:id/solve", (req, res) => {
   }
   const solution = result.output.solution;
 
-  DB('boxes').withSchema('private').select("solution").where("id", parseInt(id)).then(r => {
+  DB('boxes').select("solution").where("id", parseInt(id)).then(r => {
     if (r.length === 0) {
       return res.status(404).json({
         success: false,
